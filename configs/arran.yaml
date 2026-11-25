@@ -1,0 +1,65 @@
+# Isle of Arran: 30 m DEM, landcover, forest, mixed clouds.
+aoi:
+  bbox: [-5.47, 55.42, -5.00, 55.74]
+
+output:
+  path: renders/arran.png
+  width_px: 2400
+
+terrain:
+  z_exaggeration: 2.0
+
+sun:
+  azimuth_deg: 315
+  altitude_deg: 28
+
+lighting:
+  ambient: 0.35
+  shadow_strength: 0.85
+
+colour:
+  ramp: highland
+  rock_slope_deg: [25, 45]
+
+water:
+  ocean_colour: "#22505d"
+  shallow_colour: "#2f6b70"
+  shallow_width_m: 1500
+  texture_scale_m: 8000
+
+landcover:
+  enabled: true
+  tint: 0.5
+  colours:
+    10: "#2f4a2a"      # conifer plantations
+    20: "#7a6b4c"      # heather / shrub
+    30: "#8d9a5c"      # rough grass
+    40: "#a7ad74"      # farmland
+    60: "#9c968a"      # bare granite
+    90: "#6e7550"      # bog
+    100: "#857f5c"     # moss / lichen
+
+forest:
+  enabled: true
+  colour: "#2b4226"
+
+clouds:
+  enabled: true
+  seed: 4
+  layers:                           # presets: relief/cloud_presets.yaml (preview: cloud_gallery.py)
+    - preset: valley_fog            # fog in some of the glens
+      top_m: p35
+      coverage: 0.45
+    - preset: faint_mist            # thin haze in other low ground
+      coverage: 0.4
+    - preset: mountain_cap          # cloud on the northern granite peaks
+      coverage: 0.55
+      density: 0.75
+      wisp: 0.4
+      wind_from_deg: 240
+    - preset: fair_weather_cumulus  # a few puffs over sea and island
+      altitude_m: 900
+      thickness_m: 350
+      noise_scale_m: 2200
+      billow_scale_m: 400
+      coverage: 0.07

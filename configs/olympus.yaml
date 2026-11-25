@@ -1,0 +1,38 @@
+# Mount Olympus & Thessaly: small area -> 30 m DEM, landcover, forest canopy, valley fog.
+aoi:
+  bbox: [22.05, 39.85, 22.75, 40.30]
+
+output:
+  path: renders/olympus.png
+  width_px: 2400
+
+terrain:
+  z_exaggeration: 1.6
+
+sun:
+  azimuth_deg: 315
+  altitude_deg: 32
+
+colour:
+  ramp: aegean
+
+landcover:
+  enabled: true
+
+forest:
+  enabled: true
+
+clouds:
+  enabled: true
+  seed: 3
+  layers:
+    - type: valley_fog       # fog sitting in valleys whose floor is 250-750 m
+      min_ground_m: 250
+      top_m: 750
+      coverage: 0.5
+      density: 0.85
+      breakup: 0.2
+    - type: scattered        # a few high cumulus with offset shadows
+      altitude_m: 2600
+      coverage: 0.06
+      density: 0.8

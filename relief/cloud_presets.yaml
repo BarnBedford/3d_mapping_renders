@@ -1,0 +1,117 @@
+# Cloud preset library. Use in a config as:
+#   clouds:
+#     layers:
+#       - preset: faint_mist
+#         top_m: 150          # any key here overrides the preset
+#
+# A preset is just a bundle of layer settings; every key is documented under
+# clouds.types in defaults.yaml. Add your own presets here.
+# Altitudes (top_m, min_ground_m, base_m, altitude_m) can be metres or a percentile
+# of the area's land elevation, "p25" or "p90+100", so presets adapt to any area.
+# Preview them all on your area with:  python cloud_gallery.py configs/<area>.yaml
+
+faint_mist:            # see-through haze lying in valley bottoms
+  type: valley_fog
+  top_m: p40
+  density: 0.55
+  fade_m: 150
+  wisp: 0.55
+  wisp_scale_m: 600
+  warp: 0.4
+  breakup: 0.05
+  thickness_m: 6
+  valleys_only: true
+  valley_depth_m: 50
+  coast_clearance_m: 800
+  coverage: 0.8
+
+valley_fog:            # thicker fog filling valleys, edges thinning out
+  type: valley_fog
+  top_m: p50
+  valleys_only: true
+  valley_depth_m: 60
+  coast_clearance_m: 600
+  density: 0.85
+  fade_m: 100
+  wisp: 0.25
+  warp: 0.3
+  breakup: 0.1
+  thickness_m: 15
+  coverage: 0.7
+
+morning_inversion:     # "sea of clouds": a blanket over the lowlands, hills poking out
+  type: blanket
+  top_m: p45
+  density: 0.9
+  coverage: 0.92
+  softness: 0.15
+  fade_m: 90
+  thickness_m: 35
+  wisp: 0.2
+
+thin_blanket:          # translucent stratus sheet with soft holes
+  type: blanket
+  top_m: p70
+  density: 0.45
+  coverage: 0.7
+  softness: 0.3
+  fade_m: 200
+  thickness_m: 25
+  wisp: 0.3
+  wisp_scale_m: 2000
+  warp: 0.3
+
+fair_weather_cumulus:  # small scattered puffs
+  type: cumulus
+  altitude_m: 1200
+  thickness_m: 450
+  noise_scale_m: 2500
+  coverage: 0.10
+  billow_scale_m: 500
+  density: 0.9
+  wisp: 0.2
+  warp: 0.15
+
+big_cumulus:           # larger, towering clouds with strong shadows
+  type: cumulus
+  altitude_m: 1500
+  thickness_m: 1400
+  noise_scale_m: 4500
+  coverage: 0.12
+  billow_scale_m: 900
+  density: 0.95
+  wisp: 0.15
+  warp: 0.15
+
+mountain_cap:          # rounded cloud sitting on the summits
+  type: orographic
+  base_m: p93
+  coverage: 0.7
+  drift_m: 400
+  thickness_m: 200
+  density: 0.85
+  wisp: 0.25
+  warp: 0.1
+
+banner_cloud:          # cloud streaming downwind from the peaks
+  type: orographic
+  base_m: p90
+  coverage: 0.6
+  drift_m: 3000
+  stretch: 4
+  noise_scale_m: 800
+  thickness_m: 150
+  wisp: 0.4
+  warp: 0.15
+  density: 0.75
+
+cirrus:                # high, thin, streaky
+  type: cirrus
+  density: 0.3
+  coverage: 0.3
+  noise_scale_m: 700
+  stretch: 12
+  softness: 0.25
+  wisp: 0.5
+  wisp_scale_m: 2500
+  warp: 0.25

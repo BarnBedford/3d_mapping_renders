@@ -1,0 +1,154 @@
+# Every setting the renderer understands, with its default.
+# Your config only needs the keys you want to change.
+
+aoi:
+  bbox: [21.9, 39.8, 22.7, 40.3]   # lon_min, lat_min, lon_max, lat_max (WGS84)
+  crs: auto                        # "auto" = UTM zone of the centre, or e.g. "EPSG:2100"
+
+output:
+  path: renders/render.png
+  width_px: 3000                   # height follows from the bbox
+  geotiff: true                    # also write a georeferenced .tif next to the PNG
+  save_layers: false               # write intermediate layers (shadow, ambient, ...) for debugging
+
+dem:
+  source: auto                     # auto | glo30 | glo90 | path/to/your_dem.tif
+  sea_level_m: 0.5                 # DEM cells at/below this (or missing) are ocean
+
+terrain:
+  z_exaggeration: 2.0              # vertical exaggeration for shading AND cast shadows
+
+sun:
+  azimuth_deg: 315                 # compass direction the light comes from (315 = NW)
+  altitude_deg: 30                 # lower = longer shadows
+
+lighting:
+  direct: 0.70                     # weight of direct sunlight
+  ambient: 0.40                    # weight of sky light (ambient occlusion)
+  shadow_strength: 0.80            # 1 = black cast shadows, 0 = no cast shadows
+  shadow_samples: 6                # jittered sun positions averaged -> soft shadow edges
+  sun_radius_deg: 1.5              # jitter radius; bigger = softer penumbra
+  shadow_softness_m: 15            # anti-alias the shadow edge (in exaggerated metres)
+  ambient_directions: 12           # sky directions sampled for ambient occlusion
+  ambient_altitudes_deg: [12, 30, 55]
+  ambient_downsample: 2            # compute ambient at 1/N resolution (it is smooth anyway)
+  highlight: 0.35                  # sunlit slopes brighten toward white
+  exposure: 1.0
+  gamma: 1.0
+  contrast: 1.05
+  saturation: 1.0
+
+colour:
+  ramp: aegean                     # preset name (see relief/colour.py PRESETS) or a list of [elev_m, "#hex"]
+  variation: 0.07                  # mottling so flat areas are not flat colour
+  variation_scale_m: 5000
+  rock_colour: "#9b9282"
+  rock_slope_deg: [28, 50]         # slope where rock tint starts / is full
+  rock_strength: 0.45
+
+water:
+  ocean_colour: "#2c6470"          # deep water
+  shallow_colour: "#3f8a8c"        # near the coast
+  shallow_width_m: 4000            # how far the shallow tint reaches out from the coast
+  lake_colour: "#2a5c68"
+  detect_lakes: true               # Copernicus DEM flattens lakes; flat areas become water
+  min_lake_area_km2: 0.3
+  texture: 0.07                    # mottling strength on water
+  texture_scale_m: 20000
+
+landcover:                         # ESA WorldCover 10 m (fetched automatically)
+  enabled: false
+  tint: 0.55                       # 0 = ignore class colours, 1 = class colour replaces the ramp
+  max_pixel_m: 60                  # skip landcover when pixels are coarser than this
+  use_water: true                  # add WorldCover rivers/lakes to the water mask
+  colours:
+    10: "#3e5f30"                  # tree cover
+    20: "#7c8a4e"                  # shrubland
+    30: "#a3ad6c"                  # grassland
+    40: "#c3bd92"                  # cropland
+    50: "#b3aaa0"                  # built-up
+    60: "#bdb3a0"                  # bare / sparse
+    70: "#f4f5f7"                  # snow / ice
+    90: "#6f8f6a"                  # wetland
+
+forest:                            # canopy micro-relief: trees get lit and cast shadows
+  enabled: false                   # needs landcover data (fetched automatically)
+  tree_height_m: 15                # NOT exaggerated
+  crown_m: 9
+  density: 0.7                     # 0..1 canopy closure
+  colour: "#38552b"
+  colour_strength: 0.35            # extra darkening/greening on top of the landcover tint
+
+clouds:
+  enabled: false
+  seed: 1                          # change to re-roll every layer's random arrangement
+  sun_colour: "#fff9f0"            # light on the sunlit side of clouds
+  shade_colour: "#b9c4d0"          # blue-grey sky light in cloud shadow
+  ambient: 0.55
+  direct: 0.55
+  cast_shadows: true               # floating clouds shade the ground/lower layers
+  shadow_strength: 0.9
+  self_shadow: true                # billows shade each other (costs one shadow pass per layer)
+  self_shadow_strength: 0.5        # how dark the shaded side of billows gets (clouds scatter light)
+  layers: []                       # each layer: {preset: ..., type: ..., any key below}
+                                   # presets: relief/cloud_presets.yaml
+
+  types:                           # per-type defaults (a layer's "type" picks one)
+    common:                        # shared by all types
+      density: 0.8                 # max opacity
+      coverage: 0.5                # how much of the eligible area gets cloud
+      softness: 0.10               # edge softness (noise units)
+      wisp: 0.35                   # 0 = uniform opacity, 1 = very wispy / see-through
+      wisp_scale_m: 800
+      warp: 0.4                    # swirl the edges (0 = blobby)
+      bbox: null                   # optional [lon_min, lat_min, lon_max, lat_max]
+      seed: null                   # set to re-roll just this layer
+      colour: null                 # override cloud colour for this layer
+    valley_fog:                    # fog filling valleys up to an altitude
+      top_m: 800                   # fog surface altitude
+      top_variation_m: 60          # large-scale undulation of the fog top
+      thickness_m: 12              # bumps on the fog top (for shading)
+      region_scale_m: 15000        # coverage picks random patches of this size
+      breakup: 0.15                # 0 = continuous, 1 = very patchy
+      breakup_scale_m: 1500
+      fade_m: 120                  # opacity builds over this depth below the fog top
+      valleys_only: false          # true = skip broad plains, keep incised valleys
+      valley_scale_m: 4000         # neighbourhood used to decide what counts as a valley
+      valley_depth_m: 60           # depth below surroundings to be fully foggy
+      min_ground_m: null           # no fog where (smoothed) ground is below this
+      coast_clearance_m: 0         # keep fog this far inland (stops a white ring round coasts)
+      over_sea: false
+    blanket:                       # stratus sheet at top_m; higher ground pokes through
+      top_m: 500
+      top_variation_m: 40
+      thickness_m: 40
+      billow_scale_m: 1500
+      fade_m: 150
+      holes_scale_m: 4000          # coverage < 1 makes holes of this size
+      coverage: 0.8
+      over_sea: true
+    cumulus:                       # floating puffy clouds
+      altitude_m: 1500             # cloud base
+      thickness_m: 800             # dome height (exaggerated with the terrain)
+      noise_scale_m: 5000          # cloud size
+      billow_scale_m: 900          # puff size on top
+      coverage: 0.15
+    orographic:                    # caps / banners on high ground (coverage = share of high ground clouded)
+      base_m: 500                  # ground height where cloud starts to form
+      range_m: 300                 # ... and is fully formed this much higher
+      smooth_m: 600                # summit smoothing; bigger = rounder caps
+      clearance_m: 40              # cloud base above the ground
+      thickness_m: 250
+      wind_from_deg: 240           # banners stream downwind (compass, wind FROM)
+      drift_m: 1000
+      noise_scale_m: 2500
+      stretch: 1                   # >1 streaks the cloud along the wind
+      billow_scale_m: 500
+    cirrus:                        # high thin streaks along the wind
+      altitude_m: 7000
+      thickness_m: 80
+      noise_scale_m: 1500          # streak width
+      stretch: 8                   # streak length = width x stretch
+      wind_from_deg: 270
+      coverage: 0.3
+      density: 0.4

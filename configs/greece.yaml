@@ -1,0 +1,27 @@
+# Whole Aegean, poster style like the Visual Geomatics reference (90 m DEM).
+aoi:
+  bbox: [19.3, 34.7, 29.0, 42.3]
+  crs: "EPSG:3035"
+
+output:
+  path: renders/greece.png
+  width_px: 3000
+
+terrain:
+  z_exaggeration: 6.0
+
+sun:
+  azimuth_deg: 315
+  altitude_deg: 35
+
+lighting:
+  shadow_strength: 0.7
+  sun_radius_deg: 2.5
+
+colour:
+  ramp: aegean
+  rock_slope_deg: [8, 20]      # slopes look gentler at coarse resolution
+
+water:
+  shallow_width_m: 12000
+  texture_scale_m: 60000
